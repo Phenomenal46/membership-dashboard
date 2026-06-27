@@ -18,7 +18,8 @@ export default function EmptyState() {
             </h3>
 
             <p className="mt-2 text-gray-500">
-                Try changing your search.
+                Try changing your search <br/>
+                or add a new Member.
             </p>
         </div>
     );

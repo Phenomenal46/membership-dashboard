@@ -4,6 +4,7 @@ import SearchBar from "../components/Members/SearchBar";
 import MembersTable from "../components/Members/MembersTable";
 import LoadingTable from "../components/Members/LoadingTable";
 import AddMemberModal from "../components/Forms/AddMemberModal";
+import LoadingCards from "../components/Dashboard/LoadingCards";
 
 import useMembers from "../hooks/useMembers";
 import { useState, useMemo } from "react";
@@ -66,23 +67,11 @@ export default function Dashboard() {
                 "
             >
 
-                {loading && (
-                    <p>
-                        Loading dashboard...
-                    </p>
-                )}
-
                 {error && (
-                    <p>
-                        {error}
-                    </p>
+                    <ErrorState message={error}/>
                 )}
 
-                {!loading && (
-                    <AnalyticsCards
-                        analytics={analytics}
-                    />
-                )}
+                {loading ? <LoadingCards /> : <AnalyticsCards analytics={analytics}/>}
 
                 <div
                     className="

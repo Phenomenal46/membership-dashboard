@@ -25,7 +25,7 @@ export default function MembersTable({
             "
         >
 
-            <table className="w-full">
+            <table className="w-full overflow-x-auto">
 
                 <thead>
 

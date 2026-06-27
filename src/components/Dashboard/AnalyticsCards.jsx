@@ -34,7 +34,7 @@ export default function AnalyticsCards({
             />
 
             <StatCard
-                title="New Signups"
+                title="New Signups Today"
                 value={analytics.newSignups}
                 icon={<FiUserPlus />}
             />

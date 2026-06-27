@@ -12,12 +12,14 @@ export default function StatCard({
                 bg-white
                 p-6
                 shadow-sm
-                transition
                 hover:shadow-md
                 hover: cursor-pointer
 
                 dark:border-slate-700
-                dark:bg-slate-800
+                dark:bg-slate-800 
+                transition-all
+                duration-200
+                hover:-translate-y-1
             "
         >
             <div className="flex items-center justify-between">
@@ -26,9 +28,9 @@ export default function StatCard({
 
                     <p
                         className="
-                            text-sm
-                            text-gray-500
-                            dark:text-gray-400
+                            text-md
+                            text-gray-900
+                            dark:text-gray-300
                         "
                     >
                         {title}
