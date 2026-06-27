@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function MemberForm({
     onSubmit,
@@ -12,9 +13,8 @@ export default function MemberForm({
         status: "Active",
     });
 
-    const [errors, setErrors] =
-        useState({});
-
+    const [errors, setErrors] = useState({});
+    const { theme } = useTheme();
 
     function validate() {
 
@@ -164,11 +164,22 @@ export default function MemberForm({
                         e.target.value
                     )
                 }
+                // tell browser to render native dropdown in dark mode
+                style={{
+                    colorScheme:
+                        theme === "dark"
+                            ? "dark"
+                            : "light",
+                }}
+
                 className="
                     w-full
                     rounded-lg
                     border
                     p-3
+                    dark:border-slate-600
+                    dark:bg-slate-700
+                    dark:text-white
                     hover:cursor-pointer
                 "
             >
@@ -194,11 +205,21 @@ export default function MemberForm({
                         e.target.value
                     )
                 }
+                style={{
+                    colorScheme:
+                        theme === "dark"
+                            ? "dark"
+                            : "light",
+                }}
+
                 className="
                     w-full
                     rounded-lg
                     border
                     p-3
+                    dark:border-slate-600
+                    dark:bg-slate-700
+                    dark:text-white
                     hover:cursor-pointer
                 "
             >
@@ -222,6 +243,7 @@ export default function MemberForm({
                     disabled:opacity-50
                     hover:bg-gray-800   
                     hover:cursor-pointer
+                    dark:hover:bg-gray-700
                 "
             >
                 {

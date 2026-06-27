@@ -5,15 +5,15 @@ import MembersTable from "../components/Members/MembersTable";
 import LoadingTable from "../components/Members/LoadingTable";
 import AddMemberModal from "../components/Forms/AddMemberModal";
 import LoadingCards from "../components/Dashboard/LoadingCards";
-
+import Pagination from "../components/Members/Pagination";
 import useMembers from "../hooks/useMembers";
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import { calculateAnalytics } from "../utils/analytics";
 
 
 export default function Dashboard() {
-// get member data and addMember function from custom hook
+    // get member data and addMember function from custom hook
     const {
         members,
         loading,
@@ -26,6 +26,9 @@ export default function Dashboard() {
 
     const [search, setSearch] = useState("");
     const [isOpen, setIsOpen] = useState(false);
+    // pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     // instant search by name/email
     const filteredMembers = useMemo(() => {
@@ -46,6 +49,44 @@ export default function Dashboard() {
         });
 
     }, [members, search]);
+
+    // calculate total pages
+    const totalPages = Math.max(
+        1,
+        Math.ceil(
+            filteredMembers.length /
+            rowsPerPage
+        )
+    );
+
+    // whenever search changes,
+    // go back to page 1
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [search]);
+
+    useEffect(() => {
+        if (
+            currentPage >
+            totalPages
+        ) {
+            setCurrentPage(
+                totalPages
+            );
+        }
+    }, [
+        currentPage,
+        totalPages,
+    ]);
+
+    // members to display on current page
+    const paginatedMembers =
+        filteredMembers.slice(
+            (currentPage - 1) *
+            rowsPerPage,
+            currentPage *
+            rowsPerPage
+        );
 
     return (
         <div
@@ -68,10 +109,10 @@ export default function Dashboard() {
             >
 
                 {error && (
-                    <ErrorState message={error}/>
+                    <ErrorState message={error} />
                 )}
 
-                {loading ? <LoadingCards /> : <AnalyticsCards analytics={analytics}/>}
+                {loading ? <LoadingCards /> : <AnalyticsCards analytics={analytics} />}
 
                 <div
                     className="
@@ -119,10 +160,18 @@ export default function Dashboard() {
                         )
                         : (
                             <MembersTable
-                                members={filteredMembers}
+                                members={paginatedMembers}
                             />
                         )
                 }
+
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    rowsPerPage={rowsPerPage}
+                    setRowsPerPage={setRowsPerPage}
+                    setCurrentPage={setCurrentPage}
+                />
 
                 <AddMemberModal
                     open={isOpen}
