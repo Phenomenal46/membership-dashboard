@@ -3,25 +3,28 @@ import AnalyticsCards from "../components/Dashboard/AnalyticsCards";
 import SearchBar from "../components/Members/SearchBar";
 import MembersTable from "../components/Members/MembersTable";
 import LoadingTable from "../components/Members/LoadingTable";
+import AddMemberModal from "../components/Forms/AddMemberModal";
 
 import useMembers from "../hooks/useMembers";
-import { useState,useMemo } from "react";
+import { useState, useMemo } from "react";
 
 import { calculateAnalytics } from "../utils/analytics";
 
 
 export default function Dashboard() {
-
+// get member data and addMember function from custom hook
     const {
         members,
         loading,
         error,
+        addMember,
     } = useMembers();
 
     const analytics =
         calculateAnalytics(members);
 
     const [search, setSearch] = useState("");
+    const [isOpen, setIsOpen] = useState(false);
 
     // instant search by name/email
     const filteredMembers = useMemo(() => {
@@ -81,15 +84,45 @@ export default function Dashboard() {
                     />
                 )}
 
-                <section className="mb-6">
+                <div
+                    className="
+                        mb-6
+                        flex
+                        flex-col
+                        gap-4
+                        md:flex-row
+                        "
+                >
 
-                    <SearchBar
-                        search={search}
-                        setSearch={setSearch}
-                    />
+                    <div className="flex-1">
 
-                </section>
+                        <SearchBar
+                            search={search}
+                            setSearch={setSearch}
+                        />
 
+                    </div>
+
+                    <button
+                        onClick={() =>
+                            setIsOpen(true)
+                        }
+                        className="
+                            rounded-lg
+                            bg-black
+                            px-6
+                            py-3
+                            text-white
+                            hover:bg-gray-700
+                            hover:cursor-pointer
+                            "
+                    >
+                        + Add Member
+                    </button>
+
+                </div>
+
+                {/* table */}
                 {
                     loading
                         ? (
@@ -101,6 +134,14 @@ export default function Dashboard() {
                             />
                         )
                 }
+
+                <AddMemberModal
+                    open={isOpen}
+                    onClose={() =>
+                        setIsOpen(false)
+                    }
+                    addMember={addMember}
+                />
 
             </main>
         </div>
