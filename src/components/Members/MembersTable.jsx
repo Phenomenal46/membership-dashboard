@@ -89,8 +89,14 @@ export default function MembersTable({
                                 dark:border-slate-700 dark:hover:bg-slate-700
                             "
                         >
-                            <td className="p-4 font-medium">{member.name}</td>
-                            <td className="p-4 text-gray-500 dark:text-gray-400">{member.email}</td>
+                            {/* NEW: Added max-w-[200px] and truncate */}
+                            <td className="p-4 font-medium max-w-50 truncate" title={member.name}>
+                                {member.name}
+                            </td>
+                            {/* NEW: Added max-w-[250px] and truncate */}
+                            <td className="p-4 text-gray-500 dark:text-gray-400 max-w-62.5 truncate" title={member.email}>
+                                {member.email}
+                            </td>
                             <td className="p-4">
                                 <StatusBadge value={member.membershipType} type="membership" />
                             </td>

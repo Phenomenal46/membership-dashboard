@@ -207,20 +207,29 @@ export default function Dashboard() {
                         )
                 }
 
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    rowsPerPage={rowsPerPage}
-                    setRowsPerPage={setRowsPerPage}
-                    setCurrentPage={setCurrentPage}
-                />
+                {/* Only show pagination if we have results to paginate */}
+                {filteredMembers.length > 0 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        rowsPerPage={rowsPerPage}
+                        setRowsPerPage={setRowsPerPage}
+                        setCurrentPage={setCurrentPage}
+                    />
+                )}
 
                 <AddMemberModal
                     open={isOpen}
                     onClose={() =>
                         setIsOpen(false)
                     }
-                    addMember={addMember}
+                    // NEW: Wrap addMember to handle UX state resets
+                    addMember={async (member) => {
+                        await addMember(member);
+                        setCurrentPage(1); // Jump to page 1
+                        setSearch("");     // Clear search to guarantee visibility
+                    }}
+                    members={members}
                 />
 
             </main>

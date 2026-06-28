@@ -23,13 +23,14 @@ const memberSchema = z.object({
     status: z.enum(["Active", "Inactive"]),
 });
 
-export default function MemberForm({ onSubmit, loading }) {
+export default function MemberForm({ onSubmit, loading, existingEmails = [] }) {
     const { theme } = useTheme();
 
     // 2. Initialize react-hook-form with the Zod resolver
     const {
         register,
         handleSubmit,
+        setError, // NEW: Extract setError from useForm
         formState: { errors },
     } = useForm({
         resolver: zodResolver(memberSchema),
@@ -45,6 +46,15 @@ export default function MemberForm({ onSubmit, loading }) {
     // handleSubmit automatically prevents default (e.preventDefault()) 
     // and only calls this function if Zod validation passes.
     const handleFormSubmit = (data) => {
+        const isDuplicate = existingEmails.includes(data.email.toLowerCase());
+        if (isDuplicate) {
+            // Tell react-hook-form to highlight the email field with this error
+            setError("email", { 
+                type: "manual", 
+                message: "This email is already registered." 
+            });
+            return; // Stop submission
+        }
         onSubmit({
             ...data,
             createdAt: new Date().toISOString(),

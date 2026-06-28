@@ -8,6 +8,7 @@ export default function AddMemberModal({
     open,
     onClose,
     addMember,
+    members,
 }) {
 
     const [loading, setLoading] =
@@ -45,6 +46,8 @@ export default function AddMemberModal({
         }
     }
 
+    // Extract emails for validation
+    const existingEmails = members.map(m => m.email.toLowerCase());
 
     return (
 
@@ -58,6 +61,7 @@ export default function AddMemberModal({
                 onSubmit={
                     handleSubmit
                 }
+                existingEmails={existingEmails}
             />
 
         </Modal>
