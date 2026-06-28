@@ -70,189 +70,128 @@ export default function MemberForm({
 
 
     return (
-
         <form
             onSubmit={handleSubmit}
-            className="space-y-4"
+            className="space-y-5" // Slightly increased spacing for better breathing room
         >
-
-            <h2
-                className="
-                    text-2xl
-                    font-bold
-                "
-            >
+            <h2 className="text-2xl font-bold mb-2">
                 Add a new Member
             </h2>
 
-            {/* name */}
-            <div>
-
+            {/* Name Field */}
+            <div className="flex flex-col gap-1.5">
+                <label
+                    htmlFor="name"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                    Full Name
+                </label>
                 <input
-                    placeholder="Name"
+                    id="name"
+                    placeholder="e.g. Jane Doe"
                     value={form.name}
-                    onChange={(e) =>
-                        updateField(
-                            "name",
-                            e.target.value
-                        )
-                    }
-                    className="
-                        w-full
-                        rounded-lg
-                        border
-                        p-3
-                    "
+                    onChange={(e) => updateField("name", e.target.value)}
+                    className={`
+                        w-full rounded-lg border p-3
+                        bg-gray-50 dark:bg-slate-700/50 dark:border-slate-600
+                        focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow
+                        ${errors.name ? "border-red-500 focus:ring-red-500" : "border-gray-300"}
+                    `}
                 />
-
                 {errors.name && (
-                    <p
-                        className="
-                            mt-1
-                            text-sm
-                            text-red-500
-                        "
-                    >
-                        {errors.name}
-                    </p>
+                    <p className="text-sm text-red-500">{errors.name}</p>
                 )}
-
             </div>
 
-            {/* email */}
-            <div>
-
+            {/* Email Field */}
+            <div className="flex flex-col gap-1.5">
+                <label
+                    htmlFor="email"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                    Email Address
+                </label>
                 <input
-                    placeholder="Email"
+                    id="email"
+                    type="email"
+                    placeholder="jane@example.com"
                     value={form.email}
-                    onChange={(e) =>
-                        updateField(
-                            "email",
-                            e.target.value
-                        )
-                    }
-                    className="
-                        w-full
-                        rounded-lg
-                        border
-                        p-3
-                    "
+                    onChange={(e) => updateField("email", e.target.value)}
+                    className={`
+                        w-full rounded-lg border p-3
+                        bg-gray-50 dark:bg-slate-700/50 dark:border-slate-600
+                        focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow
+                        ${errors.email ? "border-red-500 focus:ring-red-500" : "border-gray-300"}
+                    `}
                 />
-
                 {errors.email && (
-                    <p
-                        className="
-                            mt-1
-                            text-sm
-                            text-red-500
-                        "
-                    >
-                        {errors.email}
-                    </p>
+                    <p className="text-sm text-red-500">{errors.email}</p>
                 )}
-
             </div>
 
-            {/* membership */}
-            <select
-                value={
-                    form.membershipType
-                }
-                onChange={(e) =>
-                    updateField(
-                        "membershipType",
-                        e.target.value
-                    )
-                }
-                // tell browser to render native dropdown in dark mode
-                style={{
-                    colorScheme:
-                        theme === "dark"
-                            ? "dark"
-                            : "light",
-                }}
+            {/* Membership Field */}
+            <div className="flex flex-col gap-1.5">
+                <label
+                    htmlFor="membershipType"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                    Membership Tier
+                </label>
+                <select
+                    id="membershipType"
+                    value={form.membershipType}
+                    onChange={(e) => updateField("membershipType", e.target.value)}
+                    style={{ colorScheme: theme === "dark" ? "dark" : "light" }}
+                    className="
+                        w-full rounded-lg border border-gray-300 p-3
+                        bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow
+                        dark:border-slate-600 dark:bg-slate-700/50 dark:text-white
+                        hover:cursor-pointer
+                    "
+                >
+                    <option value="Basic">Basic</option>
+                    <option value="Standard">Standard</option>
+                    <option value="Premium">Premium</option>
+                </select>
+            </div>
 
-                className="
-                    w-full
-                    rounded-lg
-                    border
-                    p-3
-                    dark:border-slate-600
-                    dark:bg-slate-700
-                    dark:text-white
-                    hover:cursor-pointer
-                "
-            >
-                <option>
-                    Basic
-                </option>
+            {/* Status Field */}
+            <div className="flex flex-col gap-1.5">
+                <label
+                    htmlFor="status"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                    Account Status
+                </label>
+                <select
+                    id="status"
+                    value={form.status}
+                    onChange={(e) => updateField("status", e.target.value)}
+                    style={{ colorScheme: theme === "dark" ? "dark" : "light" }}
+                    className="
+                        w-full rounded-lg border border-gray-300 p-3
+                        bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow
+                        dark:border-slate-600 dark:bg-slate-700/50 dark:text-white
+                        hover:cursor-pointer
+                    "
+                >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
 
-                <option>
-                    Standard
-                </option>
-
-                <option>
-                    Premium
-                </option>
-            </select>
-
-            {/* status */}
-            <select
-                value={form.status}
-                onChange={(e) =>
-                    updateField(
-                        "status",
-                        e.target.value
-                    )
-                }
-                style={{
-                    colorScheme:
-                        theme === "dark"
-                            ? "dark"
-                            : "light",
-                }}
-
-                className="
-                    w-full
-                    rounded-lg
-                    border
-                    p-3
-                    dark:border-slate-600
-                    dark:bg-slate-700
-                    dark:text-white
-                    hover:cursor-pointer
-                "
-            >
-                <option>
-                    Active
-                </option>
-
-                <option>
-                    Inactive
-                </option>
-            </select>
-
+            {/* Submit Button */}
             <button
+                type="submit"
                 disabled={loading}
                 className="
-                    w-full
-                    rounded-lg
-                    bg-black
-                    py-3
-                    text-white
-                    disabled:opacity-50
-                    hover:bg-gray-800   
-                    hover:cursor-pointer
-                    dark:hover:bg-gray-700
+                    mt-2 w-full rounded-lg bg-black py-3 text-white font-medium
+                    transition-colors disabled:opacity-50 hover:bg-gray-800   
+                    hover:cursor-pointer dark:hover:bg-gray-700
                 "
             >
-                {
-                    loading
-                        ? "Adding..."
-                        : "Add Member"
-                }
+                {loading ? "Adding Member..." : "Add Member"}
             </button>
-
         </form>
     );
 }

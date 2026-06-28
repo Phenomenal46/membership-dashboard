@@ -13,14 +13,14 @@ export default function Pagination({
                 flex
                 flex-col
                 items-center
-                justify-between
+                justify-end
                 gap-4
                 text-sm
                 md:flex-row
             "
         >
             {/* rows selector */}
-            <div className="flex items-center gap-3  ml-180">
+            <div className="flex items-center gap-3 mr-5">
 
                 <span>Rows per page</span>
 
