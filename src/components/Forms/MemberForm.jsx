@@ -1,82 +1,59 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { useTheme } from "../../context/ThemeContext";
 
-export default function MemberForm({
-    onSubmit,
-    loading,
-}) {
+// 1. Define the validation schema using Zod
+// This acts as the single source of truth for our form's requirements
+const memberSchema = z.object({
+    name: z
+        .string()
+        .trim() // Automatically removes leading/trailing spaces
+        .min(3, "Minimum 3 characters required")
+        .regex(
+            /^[a-zA-Z\s\'-]+$/,
+            "Name can only contain alphabets, spaces, hyphens, and apostrophes"
+        ),
+    email: z
+        .string()
+        .trim()
+        .email("Please enter a valid email address")
+        .toLowerCase(), // Normalizes the email for consistent data storage
+    membershipType: z.enum(["Basic", "Standard", "Premium"]),
+    status: z.enum(["Active", "Inactive"]),
+});
 
-    const [form, setForm] = useState({
-        name: "",
-        email: "",
-        membershipType: "Basic",
-        status: "Active",
-    });
-
-    const [errors, setErrors] = useState({});
+export default function MemberForm({ onSubmit, loading }) {
     const { theme } = useTheme();
 
-    function validate() {
+    // 2. Initialize react-hook-form with the Zod resolver
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        resolver: zodResolver(memberSchema),
+        defaultValues: {
+            name: "",
+            email: "",
+            membershipType: "Basic",
+            status: "Active",
+        },
+    });
 
-        const newErrors = {};
-
-        // minimum validation rules
-        if (form.name.trim().length < 3)
-            newErrors.name =
-                "Minimum 3 characters";
-
-        if (
-            !/\S+@\S+\.\S+/.test(
-                form.email
-            )
-        ) {
-            newErrors.email =
-                "Invalid email";
-        }
-
-        setErrors(newErrors);
-
-        return (
-            Object.keys(newErrors)
-                .length === 0
-        );
-    }
-
-
-    function handleSubmit(e) {
-
-        e.preventDefault();
-
-        if (!validate())
-            return;
-
+    // 3. Handle the valid submission
+    // handleSubmit automatically prevents default (e.preventDefault()) 
+    // and only calls this function if Zod validation passes.
+    const handleFormSubmit = (data) => {
         onSubmit({
-            ...form,
-            createdAt:
-                new Date().toISOString(),
+            ...data,
+            createdAt: new Date().toISOString(),
         });
-    }
-
-
-    function updateField(
-        field,
-        value
-    ) {
-        setForm(prev => ({
-            ...prev,
-            [field]: value,
-        }));
-    }
-
+    };
 
     return (
-        <form
-            onSubmit={handleSubmit}
-            className="space-y-5" // Slightly increased spacing for better breathing room
-        >
-            <h2 className="text-2xl font-bold mb-2">
-                Add a new Member
-            </h2>
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
+            <h2 className="mb-2 text-2xl font-bold">Add a new Member</h2>
 
             {/* Name Field */}
             <div className="flex flex-col gap-1.5">
@@ -89,17 +66,16 @@ export default function MemberForm({
                 <input
                     id="name"
                     placeholder="e.g. Jane Doe"
-                    value={form.name}
-                    onChange={(e) => updateField("name", e.target.value)}
+                    {...register("name")} // This replaces value and onChange
                     className={`
-                        w-full rounded-lg border p-3
+                        w-full rounded-lg border p-3 transition-shadow
                         bg-gray-50 dark:bg-slate-700/50 dark:border-slate-600
-                        focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow
+                        focus:outline-none focus:ring-2 focus:ring-blue-500
                         ${errors.name ? "border-red-500 focus:ring-red-500" : "border-gray-300"}
                     `}
                 />
                 {errors.name && (
-                    <p className="text-sm text-red-500">{errors.name}</p>
+                    <p className="text-sm text-red-500">{errors.name.message}</p>
                 )}
             </div>
 
@@ -115,17 +91,16 @@ export default function MemberForm({
                     id="email"
                     type="email"
                     placeholder="jane@example.com"
-                    value={form.email}
-                    onChange={(e) => updateField("email", e.target.value)}
+                    {...register("email")}
                     className={`
-                        w-full rounded-lg border p-3
+                        w-full rounded-lg border p-3 transition-shadow
                         bg-gray-50 dark:bg-slate-700/50 dark:border-slate-600
-                        focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow
+                        focus:outline-none focus:ring-2 focus:ring-blue-500
                         ${errors.email ? "border-red-500 focus:ring-red-500" : "border-gray-300"}
                     `}
                 />
                 {errors.email && (
-                    <p className="text-sm text-red-500">{errors.email}</p>
+                    <p className="text-sm text-red-500">{errors.email.message}</p>
                 )}
             </div>
 
@@ -139,13 +114,12 @@ export default function MemberForm({
                 </label>
                 <select
                     id="membershipType"
-                    value={form.membershipType}
-                    onChange={(e) => updateField("membershipType", e.target.value)}
+                    {...register("membershipType")}
                     style={{ colorScheme: theme === "dark" ? "dark" : "light" }}
                     className="
                         w-full rounded-lg border border-gray-300 p-3
                         bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow
-                        dark:border-slate-600 dark:bg-slate-700/50 dark:text-white
+                        dark:border-slate-600 dark:bg-slate-700/50 dark:text-white 
                         hover:cursor-pointer
                     "
                 >
@@ -165,8 +139,7 @@ export default function MemberForm({
                 </label>
                 <select
                     id="status"
-                    value={form.status}
-                    onChange={(e) => updateField("status", e.target.value)}
+                    {...register("status")}
                     style={{ colorScheme: theme === "dark" ? "dark" : "light" }}
                     className="
                         w-full rounded-lg border border-gray-300 p-3

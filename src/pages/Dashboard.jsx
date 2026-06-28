@@ -8,7 +8,7 @@ import LoadingCards from "../components/Dashboard/LoadingCards";
 import Pagination from "../components/Members/Pagination";
 import useMembers from "../hooks/useMembers";
 import { useState, useEffect, useMemo } from "react";
-
+import ErrorState from "../components/UI/ErrorState";
 import { calculateAnalytics } from "../utils/analytics";
 
 
@@ -25,30 +25,71 @@ export default function Dashboard() {
         calculateAnalytics(members);
 
     const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState(""); // Holds the delayed search term
+    const [sortOrder, setSortOrder] = useState(null); // 'asc' | 'desc' | null
+
+    // Cycles through: Ascending -> Descending -> Default
+    const handleSortToggle = () => {
+        setSortOrder(prev => {
+            if (prev === null) return "asc";
+            if (prev === "asc") return "desc";
+            return null;
+        });
+    };
+
+    // Modern UX: Debounce the search input by 300ms to prevent performance lag
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(search.trim()); // .trim() prevents accidental trailing spaces breaking the search
+        }, 300);
+
+        return () => clearTimeout(handler); // Cleanup on every keystroke
+    }, [search]);
+
     const [isOpen, setIsOpen] = useState(false);
     // pagination state
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
     // instant search by name/email
+    // Smart search: Filters and sorts by relevance & lexicographical order
+    // Smart search & explicit sorting combined
     const filteredMembers = useMemo(() => {
-        const query = search.toLowerCase();
+        const query = debouncedSearch?.toLowerCase() || "";
 
-        return members.filter(member => {
-            return (
-                member.name
-                    .toLowerCase()
-                    .includes(query)
+        // 1. Filter matches first (or create a shallow copy if no search)
+        let matched = query
+            ? members.filter(member =>
+                member.name.toLowerCase().includes(query) ||
+                member.email.toLowerCase().includes(query)
+            )
+            : [...members];
 
-                ||
+        // 2. Apply sorting
+        return matched.sort((a, b) => {
+            // Priority 1: Explicit column sorting by the user
+            if (sortOrder) {
+                const comparison = a.name.localeCompare(b.name);
+                return sortOrder === "asc" ? comparison : -comparison;
+            }
 
-                member.email
-                    .toLowerCase()
-                    .includes(query)
-            );
+            // Priority 2: Smart relevance sorting if searching
+            if (query) {
+                const nameA = a.name.toLowerCase();
+                const nameB = b.name.toLowerCase();
+                const aStarts = nameA.startsWith(query);
+                const bStarts = nameB.startsWith(query);
+
+                if (aStarts && !bStarts) return -1;
+                if (bStarts && !aStarts) return 1;
+                return nameA.localeCompare(nameB);
+            }
+
+            // Priority 3: Fallback (default order)
+            return 0;
         });
 
-    }, [members, search]);
+    }, [members, debouncedSearch, sortOrder]); // Note: dependency is now debouncedSearch
 
     // calculate total pages
     const totalPages = Math.max(
@@ -59,11 +100,10 @@ export default function Dashboard() {
         )
     );
 
-    // whenever search changes,
-    // go back to page 1
+    // whenever the processed search changes, go back to page 1
     useEffect(() => {
         setCurrentPage(1);
-    }, [search]);
+    }, [debouncedSearch]);
 
     useEffect(() => {
         if (
@@ -161,6 +201,8 @@ export default function Dashboard() {
                         : (
                             <MembersTable
                                 members={paginatedMembers}
+                                sortOrder={sortOrder}
+                                onSortToggle={handleSortToggle}
                             />
                         )
                 }
